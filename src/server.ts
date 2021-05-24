@@ -1,11 +1,5 @@
-import express from 'express'
+import { app } from './app'
 
-const app = express()
-
-app.get('/', (req, res) => {
-  res.send('⚙️ 🆙 server is running')
-})
-
-app.listen(3333, () => {
-  console.log('⚙️ 🆙 server is running')
+app.listen(process.env.PROT || 3333, () => {
+  console.log(`⚙️ 🆙 server is running on port ${process.env.PORT}`)
 })
