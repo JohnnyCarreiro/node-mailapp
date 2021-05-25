@@ -1,5 +1,10 @@
 import mongoose from 'mongoose'
+import { Readable } from 'stream'
+
+import { ImportContactsService } from '@services/ImportContactsService'
+
 import Contact from '@schemas/Contact'
+import Tag from '@schemas/Tag'
 
 describe('ImportContacts', () => {
   beforeAll(async () => {
@@ -20,19 +25,24 @@ describe('ImportContacts', () => {
 
   beforeEach(async () => {
     await Contact.deleteMany({})
+    await Tag.deleteMany({})
   })
 
   it('should be able to import new contacts', async () => {
-    await Contact.create({ email: 'contact@johnnycarreiro.com' })
+    const contactsFileStream = Readable.from([
+      'contact@johnnycareiro.com',
+      'johnny@johnnycarreiro.com',
+      'jcarreiropublicidade@gmail.com'
+    ])
 
-    const list = await Contact.find({})
+    const importContactsService = new ImportContactsService()
+    importContactsService.run(contactsFileStream, ['Business Plan', 'Domain Driven Design'])
 
-    expect(list).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          email: 'contact@johnnycarreiro.com'
-        })
-      ])
-    )
+    const createdTags = await Tag.find({})
+
+    expect(createdTags).toEqual([
+      expect.objectContaining({ title: 'Business Plan' }),
+      expect.objectContaining({ title: 'Domain Driven Design' })
+    ])
   })
 })
