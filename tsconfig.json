@@ -20,8 +20,8 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl":".",
     "paths": {
-      "@controllers/*":["./src/controller/*"],
-      "@models/*":["./src/models/*"]
+      "@services/*":["./src/services/*"],
+      "@schemas/*":["src/schemas/*"]
     }
   },
   "include":[
