@@ -9,9 +9,10 @@
     "test": "jest"
   },
   "jest": {
-    "verbose": true
+    "preset": "ts-jest"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.2.4",
     "@types/express": "^4.17.11",
     "@types/jest": "^26.0.23",
     "@types/mongoose": "^5.10.5",
