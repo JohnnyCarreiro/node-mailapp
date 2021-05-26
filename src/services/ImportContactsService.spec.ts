@@ -30,19 +30,39 @@ describe('ImportContacts', () => {
 
   it('should be able to import new contacts', async () => {
     const contactsFileStream = Readable.from([
-      'contact@johnnycareiro.com',
-      'johnny@johnnycarreiro.com',
-      'jcarreiropublicidade@gmail.com'
+      'contact@johnnycareiro.com\n',
+      'johnny@johnnycarreiro.com\n',
+      'jcarreiropublicidade@gmail.com\n'
     ])
 
     const importContactsService = new ImportContactsService()
-    importContactsService.run(contactsFileStream, ['Business Plan', 'Domain Driven Design'])
+    await importContactsService.run(contactsFileStream, ['Business Plan', 'Domain Driven Design'])
 
-    const createdTags = await Tag.find({})
+    const createdTags = await Tag.find({}).lean()
 
     expect(createdTags).toEqual([
-      expect.objectContaining({ title: 'Business Plan' }),
-      expect.objectContaining({ title: 'Domain Driven Design' })
+      expect.objectContaining({ title: 'business plan' }),
+      expect.objectContaining({ title: 'domain driven design' })
     ])
+
+    const createdTagIds = createdTags.map(tag => tag._id)
+    const createdContacts = await Contact.find({}).lean()
+
+    expect(createdContacts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          email: 'contact@johnnycareiro.com',
+          tags: createdTagIds
+        }),
+        expect.objectContaining({
+          email: 'johnny@johnnycarreiro.com',
+          tags: createdTagIds
+        }),
+        expect.objectContaining({
+          email: 'jcarreiropublicidade@gmail.com',
+          tags: createdTagIds
+        })
+      ])
+    )
   })
 })
