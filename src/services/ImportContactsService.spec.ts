@@ -66,7 +66,7 @@ describe('ImportContacts', () => {
     )
   })
 
-  it('should not recreate tags thad already exists', async () => {
+  it('should not recreate tags that already exists', async () => {
     const contactsFileStream = Readable.from([
       'contact@johnnycareiro.com\n',
       'johnny@johnnycarreiro.com\n',
@@ -81,6 +81,30 @@ describe('ImportContacts', () => {
     const createdTags = await Tag.find({}).lean()
 
     expect(createdTags).toEqual([
+      expect.objectContaining({ title: 'business plan' }),
+      expect.objectContaining({ title: 'domain driven design' })
+    ])
+  })
+
+  it('should not recreate contact that already exists', async () => {
+    const contactsFileStream = Readable.from([
+      'contact@johnnycareiro.com\n',
+      'johnny@johnnycarreiro.com\n',
+      'jcarreiropublicidade@gmail.com\n'
+    ])
+
+    const tag = await Tag.create({ title: 'Business Plan' })
+    await Contact.create({ email: 'johnny@johnnycarreiro.com', tags: [tag._id] })
+
+    const importContactsService = new ImportContactsService()
+    await importContactsService.run(contactsFileStream, ['Business Plan', 'Domain Driven Design'])
+
+    const contacts = await Contact.find({
+      email: 'johnny@johnnycarreiro.com'
+    }).lean()
+
+    expect(contacts.length).toBe(1)
+    expect(contacts[0].tags).toEqual([
       expect.objectContaining({ title: 'business plan' }),
       expect.objectContaining({ title: 'domain driven design' })
     ])
