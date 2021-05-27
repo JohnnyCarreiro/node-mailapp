@@ -101,7 +101,9 @@ describe('ImportContacts', () => {
 
     const contacts = await Contact.find({
       email: 'johnny@johnnycarreiro.com'
-    }).lean()
+    })
+      .populate('tags')
+      .lean()
 
     expect(contacts.length).toBe(1)
     expect(contacts[0].tags).toEqual([

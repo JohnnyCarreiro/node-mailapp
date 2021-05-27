@@ -19,13 +19,10 @@ export class ImportContactsService {
 
     const existingTagsTitle = existingTags.map(tag => (tag.title))
 
-    console.log('existingTagsTitle:', existingTagsTitle)
     const newTagsData = tags
       .map(tag => tag.toLowerCase())
       .filter(tag => !existingTagsTitle.includes(tag))
       .map(tag => ({ title: tag }))
-
-    console.log('newTagsData:', newTagsData)
 
     const createdTags = await Tag.create(newTagsData)
     const tagIds = createdTags.map(tag => tag._id)
@@ -33,7 +30,11 @@ export class ImportContactsService {
     parseCsv.on('data', async line => {
       const [email] = line
 
-      await Contact.create({ email, tags: tagIds })
+      await Contact.findOneAndUpdate(
+        { email },
+        { $addToSet: { tags: tagIds } },
+        { upsert: true }
+      )
     })
 
     await new Promise(resolve => parseCsv.on('end', resolve))
