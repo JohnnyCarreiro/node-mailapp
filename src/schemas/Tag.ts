@@ -1,8 +1,10 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import { Document, Schema, model } from 'mongoose'
 
-type Tag = Document & {}
+type Tag = Document & {
+  title: string
+}
 
-const TagSchema = new Schema(
+export const TagSchema = new Schema(
   {
     title: {
       type: String,
@@ -17,4 +19,4 @@ const TagSchema = new Schema(
   }
 )
 
-export default mongoose.model<Tag>('Tag', TagSchema)
+export default model<Tag>('Tag', TagSchema)

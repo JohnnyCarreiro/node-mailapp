@@ -11,10 +11,23 @@ export class ImportContactsService {
     })
     const parseCsv = contactsFileStrem.pipe(parsers)
 
-    const tagsData = tags.map(tag => ({
-      title: tag
-    }))
-    const createdTags = await Tag.create(tagsData)
+    const existingTags = await Tag.find({
+      title: {
+        $in: tags
+      }
+    })
+
+    const existingTagsTitle = existingTags.map(tag => (tag.title))
+
+    console.log('existingTagsTitle:', existingTagsTitle)
+    const newTagsData = tags
+      .map(tag => tag.toLowerCase())
+      .filter(tag => !existingTagsTitle.includes(tag))
+      .map(tag => ({ title: tag }))
+
+    console.log('newTagsData:', newTagsData)
+
+    const createdTags = await Tag.create(newTagsData)
     const tagIds = createdTags.map(tag => tag._id)
 
     parseCsv.on('data', async line => {

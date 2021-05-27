@@ -78,7 +78,7 @@ describe('ImportContacts', () => {
     const importContactsService = new ImportContactsService()
     await importContactsService.run(contactsFileStream, ['Business Plan', 'Domain Driven Design'])
 
-    const createdTags = Tag.find({}).lean()
+    const createdTags = await Tag.find({}).lean()
 
     expect(createdTags).toEqual([
       expect.objectContaining({ title: 'business plan' }),
